@@ -35,6 +35,10 @@ dependencies {
     api(platform(GradleDependency.withVersion(GradleDependency.BOM_WEB_REACTOR)))
 
     constraints {
+//        rootProject.allprojects
+//            .filterNot { it.path == ":" }
+//            .forEach { api(project(it.path)) }
+
         api(GradleDependency.withVersion(GradleDependency.CACHE_CAFFEINE))
         api(GradleDependency.withVersion(GradleDependency.CACHE_LETTUCE))
         api(GradleDependency.withVersion(GradleDependency.CACHE_REDISSON))
@@ -276,21 +280,57 @@ javaPlatform {
     allowDependencies()
 }
 
-publishing {
-    publications {
-        create<MavenPublication>(GradleRepository.REPOSITORY_DEFAULT_NAME) {
-            from(components[GradleRepository.COMPONENT_JAVA_PLATFORM])
-            groupId = GradleRepository.GROUP_ID
-            artifactId = GradleModule.BOM
-            version = GradleConfig.PROJECT_VERSION
-        }
-        repositories {
-            maven {
-                isAllowInsecureProtocol = true
-                url = uri(GradleRepository.nexusUrl)
-                credentials { username = GradleRepository.NEXUS_USERNAME }
-                credentials { password = GradleRepository.NEXUS_PASSWORD }
-            }
-        }
-    }
-}
+//publishing {
+//    publications {
+//        create<MavenPublication>(GradleRepository.REPOSITORY_DEFAULT_NAME) {
+//            from(components[GradleRepository.COMPONENT_JAVA_PLATFORM])
+//            groupId = GradleRepository.GROUP_ID
+//            artifactId = GradleModule.BOM
+//            version = GradleConfig.PROJECT_VERSION
+//        }
+//        repositories {
+//            maven {
+//                isAllowInsecureProtocol = true
+//                url = uri(GradleRepository.nexusUrl)
+//                credentials { username = GradleRepository.NEXUS_USERNAME }
+//                credentials { password = GradleRepository.NEXUS_PASSWORD }
+//            }
+//        }
+//    }
+//}
+
+
+//mavenPublishing {
+//    configure(com.vanniktech.maven.publish.JavaPlatform())
+//    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+//    signAllPublications()
+//
+//    pom {
+////        group = GradleRepository.GROUP_ID
+////        version = GradleConfig.PROJECT_VERSION
+//        name.set(GradleModule.toModuleName(project.toString()))
+//        description.set("A description of what my library does.")
+//        inceptionYear.set("2022")
+//        url.set("https://gitee.com/wjmwss/library-java")
+//        licenses {
+//            license {
+//                name.set("The Apache License, Version 2.0")
+//                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+//                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+//            }
+//        }
+//        developers {
+//            developer {
+//                id.set("jimmy")
+//                name.set("jimmy")
+//                email.set("wjmwss@outlook.com")
+//                url.set("https://gitee.com/wjmwss")
+//            }
+//        }
+//        scm {
+//            url.set("https://gitee.com/wjmwss/library-java")
+//            connection.set("scm:git:https://gitee.com/wjmwss/library-java.git")
+//            developerConnection.set("scm:git:ssh://https://gitee.com/wjmwss/library-java.git")
+//        }
+//    }
+//}
