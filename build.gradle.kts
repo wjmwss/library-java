@@ -2,13 +2,15 @@ plugins {
     id(GradlePlugin.JAVA_LIBRARY)
     id(GradlePlugin.MAVEN_PUBLISH)
     id(GradlePlugin.CHECK_STYLE)
-    signing
+//    signing
 //    id ("com.vanniktech.maven.publish") version ("0.30.0")
+    id("org.jreleaser") version ("1.14.0")
 }
 
 allprojects {
     apply(plugin = GradlePlugin.MAVEN_PUBLISH)
-    apply(plugin = "signing")
+    apply(plugin = "org.jreleaser")
+//    apply(plugin = "signing")
 //    apply(plugin = "com.vanniktech.maven.publish")
     apply(plugin = GradlePlugin.CHECK_STYLE)
 
@@ -141,19 +143,96 @@ subprojects {
 
             repositories {
                 maven {
-                    url = uri("https://central.sonatype.com/")
-                    credentials {
-                        username = project.findProperty("mavenCentralUsername") as String?
-                        password = project.findProperty("mavenCentralPassword") as String?
-                    }
+                    url = uri(layout.buildDirectory.dir("staging-deploy"))
                 }
             }
         }
 
-        signing {
-//            useGpgCmd()
-            sign(publishing.publications["Maven"])
+        jreleaser {
+            signing {
+                active.set(org.jreleaser.model.Active.ALWAYS)
+                armored.set(true)
+                mode.set(org.jreleaser.model.Signing.Mode.FILE)
+                publicKey.set("/Users/jimmy/Documents/Workspace/horizon/library-java-maven-central-gpg/public.pgp")
+                secretKey.set("/Users/jimmy/Documents/Workspace/horizon/library-java-maven-central-gpg/private.pgp")
+            }
+            deploy {
+                maven {
+                    nexus2 {
+                        create("maven-central") {
+                            active.set(org.jreleaser.model.Active.ALWAYS)
+                            url = "https://s01.oss.sonatype.org/service/local"
+                            snapshotUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                            closeRepository = true
+                            releaseRepository = false
+                            stagingRepository("build/staging-deploy")
+                        }
+                    }
+                    /* Portal Publisher API
+                    mavenCentral {
+                        sonatype {
+                            active = "ALWAYS"
+                            url = "https://central.sonatype.com/api/v1/publisher"
+                            stagingRepository("target/staging-deploy")
+                        }
+                    }
+                    */
+                }
+            }
         }
+
+//        publishing {
+//            publications {
+//                create<MavenPublication>(GradleRepository.REPOSITORY_DEFAULT_NAME) {
+//                    from(components[GradleRepository.COMPONENT_JAVA])
+//                    groupId = GradleRepository.GROUP_ID
+//                    artifactId = GradleModule.toModuleName(project.toString())
+//                    version = GradleConfig.PROJECT_VERSION
+//
+//                    pom {
+//                        name.set(GradleModule.toModuleName(project.toString()))
+//                        description.set("A description of what my library does.")
+//                        inceptionYear.set("2022")
+//                        url.set("https://gitee.com/wjmwss/library-java")
+//                        licenses {
+//                            license {
+//                                name.set("The Apache License, Version 2.0")
+//                                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+//                                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+//                            }
+//                        }
+//                        developers {
+//                            developer {
+//                                id.set("jimmy")
+//                                name.set("jimmy")
+//                                email.set("wjmwss@outlook.com")
+//                                url.set("https://gitee.com/wjmwss")
+//                            }
+//                        }
+//                        scm {
+//                            url.set("https://gitee.com/wjmwss/library-java")
+//                            connection.set("scm:git:https://gitee.com/wjmwss/library-java.git")
+//                            developerConnection.set("scm:git:ssh://https://gitee.com/wjmwss/library-java.git")
+//                        }
+//                    }
+//                }
+//            }
+//
+//            repositories {
+//                maven {
+//                    url = uri("https://central.sonatype.com/")
+//                    credentials {
+//                        username = project.findProperty("mavenCentralUsername") as String?
+//                        password = project.findProperty("mavenCentralPassword") as String?
+//                    }
+//                }
+//            }
+//        }
+
+//        signing {
+////            useGpgCmd()
+//            sign(publishing.publications["Maven"])
+//        }
 
 //        mavenPublishing {
 //            configure(com.vanniktech.maven.publish.JavaLibrary(
